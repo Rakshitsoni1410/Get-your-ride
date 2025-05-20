@@ -1,15 +1,24 @@
+// Load environment variables
 const dotenv = require('dotenv');
 dotenv.config();
 
 const express = require('express');
 const cors = require('cors');
-const app = express();
 const connectDb = require('./db/db');
-connectDb();
-app.use(cors());
 
-app.get ('/', (req, res) => {
+const app = express();
+
+// Connect to MongoDB
+connectDb();
+
+// Middleware
+app.use(cors());
+app.use(express.json()); // Recommended to parse JSON requests
+
+// Routes
+app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
+// Export the app
 module.exports = app;
