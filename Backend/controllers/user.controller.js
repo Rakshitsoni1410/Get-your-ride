@@ -1,22 +1,24 @@
+const { validationResult } = require("express-validator");
 const userModel = require("../models/user.model");
 const userService = require("../services/user.service");
-const { validateUser } = require("../utils/validation/user.validation");
-// Register a new user
 
+// Register a new user
 module.exports.registerUser = async (req, res, next) => {
-  const errors = validateUser(req);
+  const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
-  const { firstname, lastname, email, password } = req.body;
+
+  const { fullname, lastname, email, password } = req.body;
   const hashedPassword = await userService.hashPassword(password);
+
   const user = await userService.createUser({
-    firstname,
-    lastname,
+    firstname: fullname.firstname,
+    lastname : fullname.lastname,
     email,
     password: hashedPassword,
   });
-  const token = user.generateAuthToken();
-  res.status(201).json({ token,user });
 
+  const token = user.generateAuthToken();
+  res.status(201).json({ token, user });
 };
