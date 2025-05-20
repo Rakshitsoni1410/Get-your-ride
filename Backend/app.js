@@ -13,7 +13,7 @@ connectDb();
 
 // Middleware
 app.use(cors());
-app.use(express.json()); // Recommended to parse JSON requests
+//app.use(express.json()); // Recommended to parse JSON requests
 
 // Routes
 app.get('/', (req, res) => {
