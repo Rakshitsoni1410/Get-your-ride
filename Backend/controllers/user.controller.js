@@ -45,3 +45,8 @@ module.exports.loginUser = async (req, res, next) => {
   const token = user.generateAuthToken();
   res.status(200).json({ token, user }); // ✅ Single response
 };
+
+// Get user profile
+module.exports.getUserProfile = async (req, res, next) =>{
+  res.status(200).json({req,user});
+}
