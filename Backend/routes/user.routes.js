@@ -31,6 +31,6 @@ router.post(
 
 // ✅ Fixed path and middleware reference
 router.get('/profile', authMiddleware.authUser, userController.getUserProfile)
-
-//router.get('/logout', authMiddleware.authUser, userController.logoutUser)
+//logout
+router.get('/logout', authMiddleware.authUser, userController.logoutUser)
 module.exports = router;
