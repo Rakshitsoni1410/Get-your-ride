@@ -14,7 +14,7 @@ const UserSignup = () => {
     e.preventDefault();
 
     const submittedData = {
-      username: {
+      fullName: {
         firstName: firstName,
         lastName: lastName,
       },
@@ -40,7 +40,7 @@ const UserSignup = () => {
         {/* Signup Form */}
         <form onSubmit={submitHandler}>
           {/* Name Inputs */}
-          <h3 className='text-lg font-medium mb-2'>What's your name</h3>
+          <h3 className='text-lg font-medium mb-2 w-full'>What's our captain's name</h3>
           <div className='flex gap-4 mb-7'>
             <input
               className='bg-[#eeeeee] w-1/2 rounded px-4 py-2 border text-lg placeholder:text-base'
@@ -61,7 +61,7 @@ const UserSignup = () => {
           </div>
 
           {/* Email Input */}
-          <h3 className='text-lg font-medium mb-2'>What's your email</h3>
+          <h3 className='text-lg font-medium mb-2 w-full'>What's our captain email</h3>
           <input
             className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base'
             type="email"
@@ -96,19 +96,12 @@ const UserSignup = () => {
           Already have an account?
           <Link to='/login' className='text-blue-600'> Login here</Link>
         </p>
-
-        {/* Optional: Show submitted data (for testing) */}
-        {userData.email && (
-          <pre className='mt-5 bg-gray-100 p-4 rounded text-sm'>
-            {JSON.stringify(userData, null, 2)}
-          </pre>
-        )}
       </div>
 
       {/* Footer Text */}
       <div>
         <p className='text-xs leading-5 text-center mb-3'>
-          By proceeding, you agree to our policy and terms of service.
+          This is a demo app for educational purposes. Please do not use real credentials.
         </p>
       </div>
     </div>
