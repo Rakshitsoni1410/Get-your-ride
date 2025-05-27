@@ -1,28 +1,45 @@
-import React, { useState } from 'react'; // ✅ Added useState import
-import { Link } from 'react-router-dom';
-
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { UserDataContext } from '../context/userContext'; // ✅ Correct import
+import.meta.env.VITE_BASE_URL
 const UserSignup = () => {
   // State variables
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [userData, setuserData] = useState({});
+
+  const navigate = useNavigate();
+  const { setUser } = useContext(UserDataContext); // ✅ Correct useContext usage
 
   // Form submit handler
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
+    try {
+      const newUser = {
+        fullName: {
+          firstName,
+          lastName
+        },
+        email,
+        password
+      };
 
-    const submittedData = {
-      fullName: {
-        firstName: firstName,
-        lastName: lastName,
-      },
-      email: email,
-      password: password,
-    };
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/register`,
+        newUser
+      );
 
-    console.log( submittedData);
+      if (response.status === 201) {
+        const data = response.data;
+        setUser(data.user);
+        navigate('/home'); // ✅ Redirect to home
+      }
+    } catch (error) {
+      console.error('Signup failed:', error.response?.data || error.message);
+      alert('Signup failed. Please try again.');
+    }
 
     // Clear input fields
     setemail('');
@@ -39,8 +56,7 @@ const UserSignup = () => {
 
         {/* Signup Form */}
         <form onSubmit={submitHandler}>
-          {/* Name Inputs */}
-          <h3 className='text-lg font-medium mb-2 w-full'>What's your  name</h3>
+          <h3 className='text-lg font-medium mb-2 w-full'>What's your name</h3>
           <div className='flex gap-4 mb-7'>
             <input
               className='bg-[#eeeeee] w-1/2 rounded px-4 py-2 border text-lg placeholder:text-base'
@@ -60,8 +76,7 @@ const UserSignup = () => {
             />
           </div>
 
-          {/* Email Input */}
-          <h3 className='text-lg font-medium mb-2 w-full'>What's your  email</h3>
+          <h3 className='text-lg font-medium mb-2'>What's your email</h3>
           <input
             className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base'
             type="email"
@@ -71,7 +86,6 @@ const UserSignup = () => {
             required
           />
 
-          {/* Password Input */}
           <h3 className='text-lg font-medium mb-2'>Enter password</h3>
           <input
             className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base'
@@ -82,7 +96,6 @@ const UserSignup = () => {
             required
           />
 
-          {/* Submit Button */}
           <button
             type="submit"
             className='bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-base'
@@ -91,14 +104,12 @@ const UserSignup = () => {
           </button>
         </form>
 
-        {/* Navigation Link */}
         <p className='text-center'>
           Already have an account?
           <Link to='/login' className='text-blue-600'> Login here</Link>
         </p>
       </div>
 
-      {/* Footer Text */}
       <div>
         <p className='text-xs leading-5 text-center mb-3'>
           This is a demo app for educational purposes. Please do not use real credentials.
