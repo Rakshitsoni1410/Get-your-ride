@@ -1,3 +1,70 @@
+# =====================
+# Dependencies
+# =====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =====================
+# Environment variables
+# =====================
 .env
-node_modules
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Backend env (if inside backend folder)
+Backend/.env
+backend/.env
+
+# =====================
+# Logs
+# =====================
+logs/
 *.log
+
+# =====================
+# Runtime files
+# =====================
+dist/
+build/
+tmp/
+temp/
+
+# =====================
+# OS files
+# =====================
+.DS_Store
+Thumbs.db
+
+# =====================
+# IDE / Editor
+# =====================
+.vscode/
+.idea/
+
+# =====================
+# Coverage reports
+# =====================
+coverage/
+
+# =====================
+# MongoDB / local DB dumps
+# =====================
+*.bson
+*.archive
+
+# =====================
+# Docker (optional)
+# =====================
+docker-compose.override.yml
+
+# =====================
+# Misc
+# =====================
+*.pem
+*.key
+*.crt
