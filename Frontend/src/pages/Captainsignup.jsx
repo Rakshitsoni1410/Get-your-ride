@@ -1,111 +1,57 @@
-import React, { useState } from 'react'; // ✅ Import useState
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
-const Captainsignup = () => {
-  // ✅ Define state variables
-  const [email, setemail] = useState('');
-  const [password, setpassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [userData, setuserData] = useState({});
+export default function UserSignup() {
+  const navigate = useNavigate();
 
-  const submitHandler = (e) => {
-    e.preventDefault();
+  const [form, setForm] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: ""
+  });
 
-    const submittedData = {
-      fullName: {
-        firstName: firstName,
-        lastName: lastName,
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSignup = async () => {
+    const res = await fetch("http://localhost:5000/api/user/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
       },
-      email: email,
-      password: password,
-    };
+      body: JSON.stringify({
+        fullname: {
+          firstname: form.firstname,
+          lastname: form.lastname
+        },
+        email: form.email,
+        password: form.password
+      })
+    });
 
-    console.log('Form submitted:', submittedData);
-    setuserData(submittedData);
-
-    // Clear inputs
-    setemail('');
-    setpassword('');
-    setFirstName('');
-    setLastName('');
+    const data = await res.json();
+    localStorage.setItem("token", data.token);
+    navigate("/home");
   };
 
   return (
-    <div className='py-5 px-5 h-screen flex flex-col justify-between'>
-      <div>
-        {/* Logo */}
-        <img src="/logo.png" alt="Logo" className="w-16 mb-10" />
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="bg-white p-8 rounded-2xl w-[350px] shadow-xl">
+        <h2 className="text-xl font-bold mb-4 text-center">Create Account</h2>
 
-        {/* Signup Form */}
-        <form onSubmit={submitHandler}>
-          {/* Name Inputs */}
-          <h3 className='text-lg font-medium mb-2'>What's our Captain's  name</h3>
-          <div className='flex gap-4 mb-7'>
-            <input
-              className='bg-[#eeeeee] w-1/2 rounded px-4 py-2 border text-lg placeholder:text-base'
-              type="text"
-              placeholder="First name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-            <input
-              className='bg-[#eeeeee] w-1/2 rounded px-4 py-2 border text-lg placeholder:text-base'
-              type="text"
-              placeholder="Last name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-          </div>
+        <input name="firstname" placeholder="First Name" onChange={handleChange} className="input" />
+        <input name="lastname" placeholder="Last Name" onChange={handleChange} className="input" />
+        <input name="email" placeholder="Email" onChange={handleChange} className="input" />
+        <input type="password" name="password" placeholder="Password" onChange={handleChange} className="input" />
 
-          {/* Email Input */}
-          <h3 className='text-lg font-medium mb-2'>What's our Captain's email</h3>
-          <input
-            className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base'
-            type="email"
-            placeholder="r@gmail.com"
-            value={email}
-            onChange={(e) => setemail(e.target.value)}
-            required
-          />
+        <button onClick={handleSignup} className="btn">Signup</button>
 
-          {/* Password Input */}
-          <h3 className='text-lg font-medium mb-2'>Enter password</h3>
-          <input
-            className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base'
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setpassword(e.target.value)}
-            required
-          />
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className='bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-base'
-          >
-            Sign up
-          </button>
-        </form>
-
-        {/* Navigation Link */}
-        <p className='text-center'>
-          Already have an account?
-          <Link to='/captain-login' className='text-blue-600'> Login here</Link>
-        </p>
-      </div>
-
-      {/* Footer Text */}
-      <div>
-        <p className='text-xs leading-5 text-center mb-3'>
-          By proceeding, you agree to our policy and terms of service.
+        <p className="text-sm text-center mt-4">
+          Already have account?{" "}
+          <Link to="/" className="font-semibold">Login</Link>
         </p>
       </div>
     </div>
   );
-};
-
-export default Captainsignup;
+}

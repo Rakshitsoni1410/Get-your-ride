@@ -1,65 +1,58 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
-const UserLogin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [userData, setuserData] = useState({})
-  const submitHandler = (e) => {
-    e.preventDefault();
-    setuserData({
-      email: email,
-      password: password
-    }) 
-    setEmail('');
-    setPassword('');
+export default function UserLogin() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    const res = await fetch("http://localhost:5000/api/user/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+    localStorage.setItem("token", data.token);
+    navigate("/home");
   };
+
   return (
-    <div className='p-7 h-screen flex flex-col justify-between'>
-      <div>
-        <img src="/logo.png" alt="Logo" className="w-16 mb-10" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-gray-900">
+      <div className="bg-white w-[350px] p-8 rounded-2xl shadow-xl">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login 🚗</h2>
 
-        <form onSubmit={submitHandler}>
-          <h3 className='text-lg font-medium mb-2'>What's your email</h3>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base'
-            type="email"
-            placeholder="r@gmail.com"
-            required
-          />
+        <input
+          className="w-full mb-3 p-2 border rounded-lg focus:ring-2 focus:ring-black outline-none"
+          type="email"
+          placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-          <h3 className='text-lg font-medium mb-2'>Enter password</h3>
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base'
-            type="password"
-            placeholder="password"
-            required
-          />
+        <input
+          className="w-full mb-4 p-2 border rounded-lg focus:ring-2 focus:ring-black outline-none"
+          type="password"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-          <button
-            type="submit"
-            className='bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-lg'
-          >
-            Login
-          </button>
-        </form>
+        <button
+          onClick={handleLogin}
+          className="w-full bg-black text-white py-2 rounded-lg hover:opacity-90"
+        >
+          Login
+        </button>
 
-        <p className='text-center'>
-          New here?
-          <Link to='/signup' className='text-blue-600'> Create new account</Link>
+        <p className="text-sm text-center mt-4">
+          Don’t have account?{" "}
+          <Link to="/signup" className="font-semibold">
+            Signup
+          </Link>
         </p>
-      </div>
-      <div>
-        <Link to='/captain-login' className='bg-[#10b461] flex items-center justify-center text-white font-semibold mb-5 rounded px-4 py-2 w-full text-lg'>
-          Sign in as captain
-        </Link>
       </div>
     </div>
   );
-};
-
-export default UserLogin;
+}
