@@ -12,6 +12,8 @@ import CaptainProfile from "./pages/captain/CaptainProfile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserProfile from "./pages/UserProfile";
+import RideSelection from "./pages/RideSelection";
+import SearchingDriver from "./pages/SearchingDriver";
 function App() {
   return (
     <>
@@ -59,7 +61,17 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        {/* RIDE SELECTION */}
+        <Route
+          path="/ride/select"
+          element={
+            <ProtectedRoute role="user">
+              <RideSelection />
+            </ProtectedRoute>
+          }
+        />
+        {/*seaching the ride */}
+        <Route path="/ride/searching" element={<SearchingDriver />} />
         {/* OPTIONAL */}
         <Route path="*" element={<h1>Page Not Found</h1>} />
       </Routes>
