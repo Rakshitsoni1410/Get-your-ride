@@ -1,21 +1,31 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-export default function UserSignup() {
+export default function CaptainSignup() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     firstname: "",
     lastname: "",
     email: "",
-    password: ""
+    password: "",
+    phone: "",
+
+    vehicleColor: "",
+    plate: "",
+    capacity: "",
+    vehicleType: "car",
+
+    licenseNumber: "",
+    licenseExpiry: ""
   });
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSignup = async () => {
-    const res = await fetch("http://localhost:5000/api/user/register", {
+    const res = await fetch("http://localhost:5000/api/captain/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -26,31 +36,78 @@ export default function UserSignup() {
           lastname: form.lastname
         },
         email: form.email,
-        password: form.password
+        password: form.password,
+        phone: form.phone,
+
+        vehicle: {
+          color: form.vehicleColor,
+          plate: form.plate,
+          capacity: Number(form.capacity),
+          vehicleType: form.vehicleType
+        },
+
+        license: {
+          number: form.licenseNumber,
+          expiry: form.licenseExpiry
+        }
       })
     });
 
     const data = await res.json();
-    localStorage.setItem("token", data.token);
-    navigate("/home");
+
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      navigate("/home");
+    } else {
+      alert(data.message || "Signup failed");
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="bg-white p-8 rounded-2xl w-[350px] shadow-xl">
-        <h2 className="text-xl font-bold mb-4 text-center">Create Account</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black px-4">
 
-        <input name="firstname" placeholder="First Name" onChange={handleChange} className="input" />
-        <input name="lastname" placeholder="Last Name" onChange={handleChange} className="input" />
-        <input name="email" placeholder="Email" onChange={handleChange} className="input" />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} className="input" />
+      <div className="card">
 
-        <button onClick={handleSignup} className="btn">Signup</button>
+        <h1 className="title">Get Your Ride 🚗</h1>
+        <p className="subtitle text-blue-300">Captain Registration</p>
 
-        <p className="text-sm text-center mt-4">
-          Already have account?{" "}
-          <Link to="/" className="font-semibold">Login</Link>
+        {/* PERSONAL INFO */}
+        <input name="firstname" onChange={handleChange} className="input mt-6" placeholder="First Name" />
+        <input name="lastname" onChange={handleChange} className="input" placeholder="Last Name" />
+        <input name="email" onChange={handleChange} className="input" placeholder="Email" />
+        <input name="password" type="password" onChange={handleChange} className="input" placeholder="Password" />
+        <input name="phone" onChange={handleChange} className="input" placeholder="Phone Number" />
+
+        {/* VEHICLE INFO */}
+        <input name="vehicleColor" onChange={handleChange} className="input" placeholder="Vehicle Color" />
+        <input name="plate" onChange={handleChange} className="input" placeholder="Vehicle Plate Number" />
+        <input name="capacity" onChange={handleChange} className="input" placeholder="Capacity (e.g. 4)" />
+
+        <select
+          name="vehicleType"
+          onChange={handleChange}
+          className="input text-black"
+        >
+          <option value="car">Car</option>
+          <option value="bike">Bike</option>
+          <option value="auto">Auto</option>
+        </select>
+
+        {/* LICENSE */}
+        <input name="licenseNumber" onChange={handleChange} className="input" placeholder="License Number" />
+        <input name="licenseExpiry" type="date" onChange={handleChange} className="input" />
+
+        <button onClick={handleSignup} className="btn">
+          Register Captain
+        </button>
+
+        <p className="text-sm text-center mt-5 text-gray-300">
+          User?{" "}
+          <Link to="/signup" className="text-white font-semibold">
+            Signup here
+          </Link>
         </p>
+
       </div>
     </div>
   );

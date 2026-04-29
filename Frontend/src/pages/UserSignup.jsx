@@ -11,59 +11,55 @@ export default function UserSignup() {
     password: ""
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSignup = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/user/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+    const res = await fetch("http://localhost:5000/api/user/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullname: {
+          firstname: form.firstname,
+          lastname: form.lastname
         },
-        body: JSON.stringify({
-          fullname: {
-            firstname: form.firstname,
-            lastname: form.lastname
-          },
-          email: form.email,
-          password: form.password
-        })
-      });
+        email: form.email,
+        password: form.password
+      })
+    });
 
-      const data = await res.json();
-      console.log(data); // 👈 DEBUG
+    const data = await res.json();
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        navigate("/home");
-      } else {
-        alert(data.message || "Signup failed");
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert("Server error");
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      navigate("/home");
+    } else {
+      alert(data.message);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="bg-white p-8 rounded-2xl w-[350px] shadow-xl">
-        <h2 className="text-xl font-bold mb-4 text-center">Create Account</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black px-4">
 
-        <input name="firstname" placeholder="First Name" onChange={handleChange} className="input" />
-        <input name="lastname" placeholder="Last Name" onChange={handleChange} className="input" />
-        <input name="email" placeholder="Email" onChange={handleChange} className="input" />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} className="input" />
+      <div className="card">
+
+        <h1 className="title">Get Your Ride 🚗</h1>
+        <p className="subtitle">Create your account</p>
+
+        <input name="firstname" onChange={handleChange} className="input mt-6" placeholder="First Name" />
+        <input name="lastname" onChange={handleChange} className="input" placeholder="Last Name" />
+        <input name="email" onChange={handleChange} className="input" placeholder="Email" />
+        <input name="password" onChange={handleChange} className="input" placeholder="Password" type="password" />
 
         <button onClick={handleSignup} className="btn">Signup</button>
 
-        <p className="text-sm text-center mt-4">
+        <p className="text-sm text-center mt-5 text-gray-300">
           Already have account?{" "}
-          <Link to="/" className="font-semibold">Login</Link>
+          <Link to="/" className="text-white font-semibold">
+            Login
+          </Link>
         </p>
+
       </div>
     </div>
   );

@@ -18,9 +18,10 @@ const captainSchema = new mongoose.Schema({
     required: true
   },
 
-  phone: {                          // ✅ mobile number
+  phone: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
 
   vehicle: {
@@ -29,42 +30,62 @@ const captainSchema = new mongoose.Schema({
     capacity: Number,
     vehicleType: {
       type: String,
-      enum: ["car", "bike", "auto"],   // controlled values
+      enum: ["car", "bike", "auto"],
       required: true
     }
   },
 
-  license: {                        // ✅ driving license
+  license: {
     number: { type: String, required: true },
     expiry: Date
   },
 
-  documents: {                      // ✅ real-world requirement
-    rc: String,                     // registration certificate
+  documents: {
+    rc: String,
     insurance: String
   },
 
-  rental: {                         // ✅ if vehicle is rented
+  rental: {
     isRental: { type: Boolean, default: false },
     ownerName: String,
     ownerPhone: String
   },
 
-  status: {                         // driver availability
+  status: {
     type: String,
     enum: ["offline", "online", "onride"],
     default: "offline"
   },
 
-  location: {                       // for live tracking (future)
-    lat: Number,
-    lng: Number
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point"
+    },
+    coordinates: {
+      type: [Number],
+      default: [0, 0]
+    }
   },
 
-  createdAt: {
-    type: Date,
-    default: Date.now
+  rating: {
+    type: Number,
+    default: 5
+  },
+
+  totalRides: {
+    type: Number,
+    default: 0
+  },
+
+  isVerified: {
+    type: Boolean,
+    default: false
   }
+
+}, {
+  timestamps: true
 });
 
 captainSchema.pre("save", async function () {

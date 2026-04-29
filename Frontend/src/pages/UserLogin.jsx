@@ -1,57 +1,33 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function UserLogin() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleLogin = async () => {
-    const res = await fetch("http://localhost:5000/api/user/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password })
-    });
-
-    const data = await res.json();
-    localStorage.setItem("token", data.token);
-    navigate("/home");
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-gray-900">
-      <div className="bg-white w-[350px] p-8 rounded-2xl shadow-xl">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login 🚗</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black px-4">
 
-        <input
-          className="w-full mb-3 p-2 border rounded-lg focus:ring-2 focus:ring-black outline-none"
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <div className="card">
 
-        <input
-          className="w-full mb-4 p-2 border rounded-lg focus:ring-2 focus:ring-black outline-none"
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <h1 className="title">Get Your Ride 🚗</h1>
+        <p className="subtitle">Welcome back, login to continue</p>
 
-        <button
-          onClick={handleLogin}
-          className="w-full bg-black text-white py-2 rounded-lg hover:opacity-90"
-        >
-          Login
-        </button>
+        <input className="input mt-6" type="email" placeholder="Email" />
+        <input className="input" type="password" placeholder="Password" />
 
-        <p className="text-sm text-center mt-4">
+        <button className="btn">Login</button>
+
+        <p className="text-sm text-center mt-5 text-gray-300">
           Don’t have account?{" "}
-          <Link to="/signup" className="font-semibold">
+          <Link to="/signup" className="text-white font-semibold">
             Signup
           </Link>
         </p>
+
+        <p className="text-sm text-center mt-2">
+          Captain?{" "}
+          <Link to="/captain/signup" className="text-blue-400 font-semibold">
+            Join as Captain
+          </Link>
+        </p>
+
       </div>
     </div>
   );

@@ -2,10 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-.input {
-  @apply w-full mb-3 p-2 border rounded-lg focus:ring-2 focus:ring-black outline-none;
-}
+@layer components {
+  .card {
+    @apply w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-3xl shadow-2xl p-6;
+  }
 
-.btn {
-  @apply w-full bg-black text-white py-2 rounded-lg hover:opacity-90;
+  .input {
+    @apply w-full mt-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/40;
+  }
+
+  .btn {
+    @apply w-full mt-6 py-3 rounded-xl bg-white text-black font-semibold hover:scale-[1.02] active:scale-95 transition;
+  }
+
+  .title {
+    @apply text-3xl font-bold text-center;
+  }
+
+  .subtitle {
+    @apply text-sm text-gray-300 text-center mt-1;
+  }
 }
