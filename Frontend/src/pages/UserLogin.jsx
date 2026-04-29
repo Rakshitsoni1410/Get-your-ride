@@ -1,45 +1,50 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { toast } from "react-toastify";
 export default function UserLogin() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email, password })
-      });
+const handleLogin = async () => {
+  try {
+    if (!email || !password) {
+      return toast.error("Enter email and password");
+    }
 
-      const data = await res.json();
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.role);
+    const data = await res.json();
 
-        // 🔥 auto redirect based on role
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+
+      toast.success("Login successful 🚀");
+
+      setTimeout(() => {
         if (data.role === "captain") {
           navigate("/captain/dashboard");
         } else {
           navigate("/home");
         }
+      }, 1500);
 
-      } else {
-        alert(data.message || "Login failed");
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert("Server error");
+    } else {
+      toast.error(data.message || "Login failed");
     }
-  };
 
+  } catch (err) {
+    toast.error("Server error");
+  }
+};
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black px-4">
 
