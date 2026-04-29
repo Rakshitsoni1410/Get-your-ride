@@ -7,5 +7,6 @@ const authMiddleware = require("../middleware/auth.middleware");
 
 // 🚗 CREATE RIDE ROUTE
 router.post("/create", authMiddleware.authUser, rideController.createRide);
-
+// accept 
+router.post("/accept", authMiddleware.authCaptain, rideController.acceptRide);
 module.exports = router;

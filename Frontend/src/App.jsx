@@ -14,6 +14,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import UserProfile from "./pages/UserProfile";
 import RideSelection from "./pages/RideSelection";
 import SearchingDriver from "./pages/SearchingDriver";
+import RideTracking from "./pages/RideTracking";
+
+
 function App() {
   return (
     <>
@@ -72,6 +75,8 @@ function App() {
         />
         {/*seaching the ride */}
         <Route path="/ride/searching" element={<SearchingDriver />} />
+        {/*tracking the ride */}
+        <Route path="/ride/tracking" element={<RideTracking />} />
         {/* OPTIONAL */}
         <Route path="*" element={<h1>Page Not Found</h1>} />
       </Routes>

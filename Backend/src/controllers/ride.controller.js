@@ -12,16 +12,39 @@ exports.createRide = async (req, res) => {
     const fare = Math.floor(Math.random() * 500) + 50;
 
     const ride = await Ride.create({
-      user: req.user.id,   // from JWT
+      user: req.user.id,
       pickup,
       destination,
       fare
     });
 
+    // 🔥 IMPORTANT FIX — SEND TO ALL CAPTAINS
+    global.io.to("captains").emit("new-ride", ride);
+
+    console.log("🚗 Ride sent to captains:", ride._id);
+
     res.status(201).json({ ride });
 
   } catch (err) {
     console.error("CREATE RIDE ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+// accept ride 
+exports.acceptRide = async (req, res) => {
+  try {
+    const ride = await Ride.findById(req.body.rideId);
+
+    ride.captain = req.user.id;
+    ride.status = "accepted";
+    await ride.save();
+
+    // 🔥 Notify USER
+    global.io.to(ride.user.toString()).emit("ride-accepted", ride);
+
+    res.json({ ride });
+
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };

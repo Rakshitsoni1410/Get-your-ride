@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 // ✅ USER AUTH
 exports.authUser = (req, res, next) => {
   try {
-    const token = req.headers.authorization;
+    const token = req.headers.authorization?.split(" ")[1]; // 🔥 FIX
 
     if (!token) {
       return res.status(401).json({ message: "No token provided" });
@@ -11,7 +11,7 @@ exports.authUser = (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = decoded; // contains id
+    req.user = decoded;
 
     next();
   } catch (err) {
@@ -20,11 +20,10 @@ exports.authUser = (req, res, next) => {
   }
 };
 
-
-// ✅ CAPTAIN AUTH (for later use)
+// ✅ CAPTAIN AUTH
 exports.authCaptain = (req, res, next) => {
   try {
-    const token = req.headers.authorization;
+    const token = req.headers.authorization?.split(" ")[1]; // 🔥 FIX
 
     if (!token) {
       return res.status(401).json({ message: "No token provided" });

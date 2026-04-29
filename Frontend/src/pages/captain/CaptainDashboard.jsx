@@ -1,63 +1,140 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import socket from "../../socket";
+import { toast } from "react-toastify";
 
 export default function CaptainDashboard() {
-  const [status, setStatus] = useState("offline");
+  const [ride, setRide] = useState(null);
+  const [activeRide, setActiveRide] = useState(null);
+  const [isOnline, setIsOnline] = useState(false);
 
-  const toggleStatus = () => {
-    setStatus(status === "offline" ? "online" : "offline");
+  const captainId = localStorage.getItem("captainId");
+
+  // 🔥 JOIN SOCKET ONLY
+  useEffect(() => {
+    if (!captainId) return;
+
+    socket.emit("join", { userId: captainId, role: "captain" });
+
+    const handleRide = (data) => {
+      console.log("🚗 NEW RIDE:", data);
+      setRide(data);
+      toast.info("New ride request 🚕");
+    };
+
+    socket.on("new-ride", handleRide);
+
+    return () => {
+      socket.off("new-ride", handleRide);
+    };
+  }, [captainId]);
+
+  // 🚀 GO ONLINE
+  const goOnline = () => {
+    if (!captainId) return toast.error("Login again");
+
+    socket.emit("captain-online", captainId);
+    setIsOnline(true);
+
+    toast.success("You are now ONLINE 🟢");
+  };
+
+  // 🔴 GO OFFLINE
+  const goOffline = () => {
+    setIsOnline(false);
+    setRide(null);
+
+    toast.info("You are OFFLINE 🔴");
+  };
+
+  // 🚀 ACCEPT RIDE
+const acceptRide = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch("http://localhost:5000/api/ride/accept", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // 🔥 FIXED
+      },
+      body: JSON.stringify({ rideId: ride._id }),
+    });
+
+    const data = await res.json();
+
+    if (data.ride) {
+      setActiveRide(data.ride);
+      setRide(null);
+
+      toast.success("Ride accepted 🚗");
+
+      socket.emit("accept-ride", {
+        rideId: data.ride._id,
+        userId: data.ride.user,
+        captainId: captainId,
+      });
+
+      startLocationSharing(data.ride._id);
+    }
+  } catch (err) {
+    toast.error("Error accepting ride");
+  }
+};
+  // 📍 LOCATION
+  const startLocationSharing = (rideId) => {
+    navigator.geolocation.watchPosition((pos) => {
+      socket.emit("captain-location", {
+        rideId,
+        location: {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        },
+      });
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white p-4">
+    <div className="min-h-screen bg-black text-white p-4">
+      <h1 className="text-2xl font-bold mb-4">Captain Dashboard 🚗</h1>
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold">Captain Dashboard 🚗</h1>
+      {/* 🔥 ONLINE BUTTON */}
+      <button
+        onClick={isOnline ? goOffline : goOnline}
+        className={`w-full py-3 rounded-xl mb-4 ${
+          isOnline ? "bg-red-500" : "bg-green-500"
+        }`}
+      >
+        {isOnline ? "Go Offline 🔴" : "Go Online 🟢"}
+      </button>
 
-        <Link to="/captain/profile" className="text-sm text-blue-400">
-          Profile
-        </Link>
-      </div>
-
-      {/* STATUS CARD */}
-      <div className="bg-gray-800 p-6 rounded-2xl shadow-lg mb-6">
-        <h2 className="text-lg font-semibold mb-2">Status</h2>
-
-        <p className={`mb-4 font-bold ${
-          status === "online" ? "text-green-400" : "text-red-400"
-        }`}>
-          {status.toUpperCase()}
+      {/* ❌ OFFLINE STATE */}
+      {!isOnline && (
+        <p className="text-gray-400 text-center mt-10">
+          You are offline. Go online to receive rides.
         </p>
+      )}
 
-        <button
-          onClick={toggleStatus}
-          className="btn w-full"
-        >
-          {status === "online" ? "Go Offline" : "Go Online"}
-        </button>
-      </div>
+      {/* 🔴 NEW RIDE */}
+      {isOnline && ride && (
+        <div className="bg-gray-800 p-4 rounded-xl mb-4">
+          <p className="text-lg font-semibold">New Ride Request</p>
 
-      {/* STATS */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gray-800 p-4 rounded-xl text-center">
-          <p className="text-sm text-gray-400">Today's Rides</p>
-          <h2 className="text-xl font-bold">0</h2>
+          <p className="text-sm text-gray-300 mt-2">📍 {ride.pickup}</p>
+          <p className="text-sm text-gray-300">🏁 {ride.destination}</p>
+
+          <button
+            onClick={acceptRide}
+            className="w-full mt-4 py-2 bg-green-500 rounded-lg"
+          >
+            Accept Ride
+          </button>
         </div>
+      )}
 
-        <div className="bg-gray-800 p-4 rounded-xl text-center">
-          <p className="text-sm text-gray-400">Earnings</p>
-          <h2 className="text-xl font-bold">₹0</h2>
-        </div>
-      </div>
-
-      {/* FUTURE: RIDE REQUEST */}
-      <div className="mt-6 bg-gray-800 p-4 rounded-xl">
-        <p className="text-gray-400 text-sm">
-          🚗 Waiting for ride requests...
-        </p>
-      </div>
-
+      {/* 🟢 ACTIVE RIDE */}
+      {activeRide && (
+        <div className="bg-green-900 p-4 rounded-xl">Ride in Progress 🚕</div>
+      )}
     </div>
   );
 }
