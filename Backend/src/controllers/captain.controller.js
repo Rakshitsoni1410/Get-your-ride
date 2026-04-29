@@ -30,7 +30,7 @@ exports.loginCaptain = async (req, res) => {
     const isMatch = await captain.comparePassword(password);
     if (!isMatch) return res.status(400).json({ message: "Wrong password" });
 
-    const token = jwt.sign({ id: captain._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: captain._id, role: "captain" }, process.env.JWT_SECRET)
 
     res.json({ captain, token });
   } catch (err) {
