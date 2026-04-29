@@ -16,9 +16,9 @@ export default function RideSelect() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token
+          authorization: `Bearer ${token}`, // 🔥 MUST BE EXACT
         },
-        body: JSON.stringify({ pickup, destination })
+        body: JSON.stringify({ pickup, destination }),
       });
 
       const data = await res.json();
@@ -33,7 +33,6 @@ export default function RideSelect() {
       } else {
         toast.error("Failed to create ride");
       }
-
     } catch (err) {
       toast.error("Server error");
     }
@@ -43,7 +42,9 @@ export default function RideSelect() {
     <div className="p-4 text-white bg-black min-h-screen">
       <h1>Select Ride</h1>
 
-      <p>{pickup} → {destination}</p>
+      <p>
+        {pickup} → {destination}
+      </p>
 
       <button onClick={createRide} className="btn mt-4">
         Confirm Ride

@@ -24,7 +24,7 @@ export default function RideSelection() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token
+          authorization: `Bearer ${token}`, // 🔥 MUST BE EXACT
         },
         body: JSON.stringify({
           pickup: state.pickup,

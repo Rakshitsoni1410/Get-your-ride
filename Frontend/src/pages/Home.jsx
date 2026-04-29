@@ -1,19 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import UserNavbar from "../components/UserNavbar";
 import { useNavigate } from "react-router-dom";
+import socket from "../socket";
 
 export default function Home() {
   const [pickup, setPickup] = useState("");
   const [destination, setDestination] = useState("");
   const navigate = useNavigate();
 
+  // 🔥 JOIN SOCKET
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) return;
+
+    socket.emit("join", {
+      userId,
+      role: "user",
+    });
+
+    console.log("User joined socket:", userId);
+  }, []);
+
+  // 🚗 LISTEN RIDE ACCEPTED
+  useEffect(() => {
+    const handleRideAccepted = (data) => {
+      console.log("🚗 Ride accepted:", data);
+      toast.success("Driver accepted your ride 🚕");
+    };
+
+    socket.on("ride-accepted", handleRideAccepted);
+
+    return () => {
+      socket.off("ride-accepted", handleRideAccepted);
+    };
+  }, []);
+
+  // 🔍 GO TO CONFIRM PAGE (FIXED FLOW)
   const handleNext = () => {
     if (!pickup || !destination) {
       return toast.error("Enter pickup & destination");
     }
 
-    navigate("/ride/select", {
+    navigate("/ride/confirm", {
       state: { pickup, destination },
     });
   };

@@ -7,9 +7,11 @@ export default function CaptainDashboard() {
   const [activeRide, setActiveRide] = useState(null);
   const [isOnline, setIsOnline] = useState(false);
 
+  // 🔥 CAPTAIN DATA
   const captainId = localStorage.getItem("captainId");
+  const captainToken = localStorage.getItem("captainToken");
 
-  // 🔥 JOIN SOCKET ONLY
+  // 🔥 SOCKET JOIN
   useEffect(() => {
     if (!captainId) return;
 
@@ -23,9 +25,7 @@ export default function CaptainDashboard() {
 
     socket.on("new-ride", handleRide);
 
-    return () => {
-      socket.off("new-ride", handleRide);
-    };
+    return () => socket.off("new-ride", handleRide);
   }, [captainId]);
 
   // 🚀 GO ONLINE
@@ -46,41 +46,48 @@ export default function CaptainDashboard() {
     toast.info("You are OFFLINE 🔴");
   };
 
-  // 🚀 ACCEPT RIDE
-const acceptRide = async () => {
-  try {
-    const token = localStorage.getItem("token");
+  // 🚀 ACCEPT RIDE (🔥 FIXED)
+  const acceptRide = async () => {
+    try {
+      if (!captainToken) {
+        return toast.error("Captain not logged in");
+      }
 
-    const res = await fetch("http://localhost:5000/api/ride/accept", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // 🔥 FIXED
-      },
-      body: JSON.stringify({ rideId: ride._id }),
-    });
-
-    const data = await res.json();
-
-    if (data.ride) {
-      setActiveRide(data.ride);
-      setRide(null);
-
-      toast.success("Ride accepted 🚗");
-
-      socket.emit("accept-ride", {
-        rideId: data.ride._id,
-        userId: data.ride.user,
-        captainId: captainId,
+      const res = await fetch("http://localhost:5000/api/ride/accept", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${captainToken}`, // 🔥 IMPORTANT FIX
+        },
+        body: JSON.stringify({ rideId: ride._id }),
       });
 
-      startLocationSharing(data.ride._id);
+      const data = await res.json();
+
+      if (res.ok && data.ride) {
+        setActiveRide(data.ride);
+        setRide(null);
+
+        toast.success("Ride accepted 🚗");
+
+        socket.emit("accept-ride", {
+          rideId: data.ride._id,
+          userId: data.ride.user,
+          captainId,
+        });
+
+        startLocationSharing(data.ride._id);
+      } else {
+        toast.error(data.message || "Failed to accept ride");
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Error accepting ride");
     }
-  } catch (err) {
-    toast.error("Error accepting ride");
-  }
-};
-  // 📍 LOCATION
+  };
+
+  // 📍 LOCATION TRACKING
   const startLocationSharing = (rideId) => {
     navigator.geolocation.watchPosition((pos) => {
       socket.emit("captain-location", {
@@ -97,7 +104,7 @@ const acceptRide = async () => {
     <div className="min-h-screen bg-black text-white p-4">
       <h1 className="text-2xl font-bold mb-4">Captain Dashboard 🚗</h1>
 
-      {/* 🔥 ONLINE BUTTON */}
+      {/* ONLINE BUTTON */}
       <button
         onClick={isOnline ? goOffline : goOnline}
         className={`w-full py-3 rounded-xl mb-4 ${
@@ -107,14 +114,14 @@ const acceptRide = async () => {
         {isOnline ? "Go Offline 🔴" : "Go Online 🟢"}
       </button>
 
-      {/* ❌ OFFLINE STATE */}
+      {/* OFFLINE STATE */}
       {!isOnline && (
         <p className="text-gray-400 text-center mt-10">
           You are offline. Go online to receive rides.
         </p>
       )}
 
-      {/* 🔴 NEW RIDE */}
+      {/* NEW RIDE */}
       {isOnline && ride && (
         <div className="bg-gray-800 p-4 rounded-xl mb-4">
           <p className="text-lg font-semibold">New Ride Request</p>
@@ -131,9 +138,11 @@ const acceptRide = async () => {
         </div>
       )}
 
-      {/* 🟢 ACTIVE RIDE */}
+      {/* ACTIVE RIDE */}
       {activeRide && (
-        <div className="bg-green-900 p-4 rounded-xl">Ride in Progress 🚕</div>
+        <div className="bg-green-900 p-4 rounded-xl">
+          Ride in Progress 🚕
+        </div>
       )}
     </div>
   );
