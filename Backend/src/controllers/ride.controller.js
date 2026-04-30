@@ -21,8 +21,6 @@ exports.createRide = async (req, res) => {
     // 🔥 IMPORTANT FIX — SEND TO ALL CAPTAINS
     global.io.to("captains").emit("new-ride", ride);
 
-    console.log("🚗 Ride sent to captains:", ride._id);
-
     res.status(201).json({ ride });
 
   } catch (err) {

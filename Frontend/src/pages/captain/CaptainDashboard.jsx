@@ -18,7 +18,6 @@ export default function CaptainDashboard() {
     socket.emit("join", { userId: captainId, role: "captain" });
 
     const handleRide = (data) => {
-      console.log("🚗 NEW RIDE:", data);
       setRide(data);
       toast.info("New ride request 🚕");
     };

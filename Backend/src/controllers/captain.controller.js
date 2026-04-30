@@ -13,8 +13,6 @@ exports.registerCaptain = async (req, res) => {
       license    // ✅ REQUIRED
     } = req.body;
 
-    // 🔍 DEBUG (helps if something breaks again)
-    console.log("REGISTER BODY:", req.body);
 
     // ❌ check existing captain
     const existing = await Captain.findOne({ email });

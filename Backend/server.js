@@ -21,7 +21,6 @@ global.io = io;
 const onlineCaptains = {};
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
 
   // 🔹 JOIN ROOM
   socket.on("join", ({ userId, role }) => {
@@ -31,7 +30,6 @@ io.on("connection", (socket) => {
     socket.userId = userId;
     socket.role = role;
 
-    console.log(`${role} joined room: ${userId}`);
   });
 
   // 🔹 CAPTAIN ONLINE
@@ -40,20 +38,17 @@ io.on("connection", (socket) => {
 
     socket.join("captains");
 
-    console.log("Captain online:", captainId);
   });
 
   // 🔥 NEW RIDE REQUEST → SEND TO ALL CAPTAINS
   socket.on("request-ride", (ride) => {
-    console.log("Ride requested:", ride);
 
     io.to("captains").emit("new-ride", ride);
   });
 
   // 🔥 CAPTAIN ACCEPT RIDE
   socket.on("accept-ride", ({ rideId, userId, captainId }) => {
-    console.log("Ride accepted:", rideId);
-
+   
     // send to that specific user
     io.to(userId).emit("ride-accepted", {
       rideId,

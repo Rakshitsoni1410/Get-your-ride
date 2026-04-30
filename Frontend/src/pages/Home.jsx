@@ -20,13 +20,11 @@ export default function Home() {
       role: "user",
     });
 
-    console.log("User joined socket:", userId);
   }, []);
 
   // 🚗 LISTEN RIDE ACCEPTED
   useEffect(() => {
     const handleRideAccepted = (data) => {
-      console.log("🚗 Ride accepted:", data);
       toast.success("Driver accepted your ride 🚕");
     };
 

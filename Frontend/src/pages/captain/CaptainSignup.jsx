@@ -68,7 +68,6 @@ export default function CaptainSignup() {
     try {
       setLoading(true);
 
-      console.log("FORM DATA:", form);
 
       const res = await fetch("http://localhost:5000/api/captain/register", {
         method: "POST",

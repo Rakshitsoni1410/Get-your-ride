@@ -39,7 +39,7 @@ export default function UserLogin() {
         localStorage.setItem("userToken", data.token);
         localStorage.setItem("userId", data.user._id);
       }
-      toast.success("Login successful 🚀");
+      toast.success("Login successful ");
 
       setTimeout(() => {
         if (data.role === "captain") {
