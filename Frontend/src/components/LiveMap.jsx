@@ -1,66 +1,82 @@
 import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import L from "leaflet";
+
+// 🔥 FIX ICON
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+// 🚗 CAR ICON
+const carIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/743/743922.png",
+  iconSize: [40, 40],
+});
 
 export default function LiveMap({ driverLocation, pickup, destination }) {
   const [route, setRoute] = useState([]);
 
-  // 🔥 FETCH ROUTE FROM API
-  const getRoute = async (start, end) => {
-    try {
-      const res = await axios.get(
-        `https://api.openrouteservice.org/v2/directions/driving-car`,
-        {
-          params: {
-            api_key: "YOUR_API_KEY", // 🔥 replace
-            start: `${start.lng},${start.lat}`,
-            end: `${end.lng},${end.lat}`,
-          },
-        }
-      );
-
-      const coords =
-        res.data.features[0].geometry.coordinates.map((c) => [c[1], c[0]]);
-
-      setRoute(coords);
-    } catch (err) {
-      console.error("Route error", err);
-    }
-  };
-
-  // 🔥 UPDATE ROUTE
   useEffect(() => {
-    if (!driverLocation || !pickup) return;
+    if (!driverLocation || !pickup || !destination) return;
 
-    // 🚗 Driver → Pickup
-    getRoute(driverLocation, pickup);
+    const points = [];
+    const steps = 60;
 
-  }, [driverLocation]);
+    let start;
+    let end;
+
+    // 🔥 LOGIC: DRIVER → PICKUP → DESTINATION
+    const distanceToPickup = Math.sqrt(
+      Math.pow(driverLocation.lat - pickup.lat, 2) +
+      Math.pow(driverLocation.lng - pickup.lng, 2)
+    );
+
+    // 👉 if driver far → go to pickup
+    if (distanceToPickup > 0.002) {
+      start = driverLocation;
+      end = pickup;
+    } 
+    // 👉 if driver reached pickup → go to destination
+    else {
+      start = pickup;
+      end = destination;
+    }
+
+    for (let i = 0; i <= steps; i++) {
+      const lat = start.lat + ((end.lat - start.lat) * i) / steps;
+      const lng = start.lng + ((end.lng - start.lng) * i) / steps;
+
+      points.push([lat, lng]);
+    }
+
+    setRoute(points);
+  }, [driverLocation, pickup, destination]);
 
   const center = driverLocation
     ? [driverLocation.lat, driverLocation.lng]
-    : [23.0225, 72.5714];
+    : [pickup?.lat || 23.0225, pickup?.lng || 72.5714];
 
   return (
-    <MapContainer center={center} zoom={13} style={{ height: "400px" }}>
+    <MapContainer center={center} zoom={14} className="h-[500px] w-full rounded-xl">
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-      {/* DRIVER */}
+      {/* 🚗 DRIVER */}
       {driverLocation && (
-        <Marker position={[driverLocation.lat, driverLocation.lng]} />
+        <Marker
+          position={[driverLocation.lat, driverLocation.lng]}
+          icon={carIcon}
+        />
       )}
 
-      {/* PICKUP */}
-      {pickup && (
-        <Marker position={[pickup.lat, pickup.lng]} />
-      )}
+      {/* 📍 PICKUP */}
+      {pickup && <Marker position={[pickup.lat, pickup.lng]} />}
 
-      {/* DESTINATION */}
-      {destination && (
-        <Marker position={[destination.lat, destination.lng]} />
-      )}
+      {/* 🏁 DESTINATION */}
+      {destination && <Marker position={[destination.lat, destination.lng]} />}
 
-      {/* ROUTE LINE */}
+      {/* 🛣 ROUTE */}
       {route.length > 0 && <Polyline positions={route} />}
     </MapContainer>
   );
