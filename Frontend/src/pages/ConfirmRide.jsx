@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
+import UserNavbar from "../components/UserNavbar"; // ✅ IMPORT
 
 export default function ConfirmRide() {
   const { state } = useLocation();
@@ -26,38 +27,46 @@ export default function ConfirmRide() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
+    <div className="min-h-screen flex flex-col justify-between bg-black text-white">
 
-      <div className="bg-gray-900 p-6 rounded-xl w-full max-w-md">
+      {/* 🔥 CENTER CONTENT */}
+      <div className="flex items-center justify-center flex-1 px-4">
 
-        <h1 className="text-xl font-bold mb-4">
-          Confirm Your Ride 🚗
-        </h1>
+        <div className="bg-gray-900 p-6 rounded-xl w-full max-w-md">
 
-        <div className="space-y-3 text-gray-300">
-          <p>📍 Pickup: <span className="text-white">{pickup}</span></p>
-          <p>🏁 Destination: <span className="text-white">{destination}</span></p>
-        </div>
+          <h1 className="text-xl font-bold mb-4">
+            Confirm Your Ride 🚗
+          </h1>
 
-        <div className="flex gap-3 mt-6">
+          <div className="space-y-3 text-gray-300">
+            <p>📍 Pickup: <span className="text-white">{pickup}</span></p>
+            <p>🏁 Destination: <span className="text-white">{destination}</span></p>
+          </div>
 
-          <button
-            onClick={handleCancel}
-            className="w-1/2 bg-red-500 py-2 rounded-lg"
-          >
-            Cancel
-          </button>
+          <div className="flex gap-3 mt-6">
 
-          <button
-            onClick={handleConfirm}
-            className="w-1/2 bg-green-500 py-2 rounded-lg"
-          >
-            Confirm
-          </button>
+            <button
+              onClick={handleCancel}
+              className="w-1/2 bg-red-500 py-2 rounded-lg"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleConfirm}
+              className="w-1/2 bg-green-500 py-2 rounded-lg"
+            >
+              Confirm
+            </button>
+
+          </div>
 
         </div>
 
       </div>
+
+      {/* ✅ NAVBAR */}
+      <UserNavbar />
 
     </div>
   );

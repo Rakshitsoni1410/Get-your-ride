@@ -10,10 +10,12 @@ export default function UserProfile() {
     const token = localStorage.getItem("token");
 
     fetch("http://localhost:5000/api/user/me", {
-      headers: { Authorization: token }
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-      .then(res => res.json())
-      .then(data => setUser(data.user))
+      .then((res) => res.json())
+      .then((data) => setUser(data.user))
       .catch(() => navigate("/"));
   }, []);
 
@@ -26,19 +28,17 @@ export default function UserProfile() {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col justify-between">
-
       <div className="p-4">
         <h1 className="text-xl font-bold mb-4">Profile 👤</h1>
 
         <div className="bg-gray-800 p-4 rounded-xl space-y-2">
-          <p>{user.fullname.firstname} {user.fullname.lastname}</p>
+          <p>
+            {user.fullname.firstname} {user.fullname.lastname}
+          </p>
           <p className="text-gray-400">{user.email}</p>
         </div>
 
-        <button
-          onClick={logout}
-          className="btn mt-4 bg-red-500"
-        >
+        <button onClick={logout} className="btn mt-4 bg-red-500">
           Logout
         </button>
       </div>
@@ -46,4 +46,4 @@ export default function UserProfile() {
       <UserNavbar />
     </div>
   );
-} 
+}
