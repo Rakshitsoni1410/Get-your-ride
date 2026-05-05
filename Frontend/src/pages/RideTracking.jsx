@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import socket from "../socket";
+import { useLocation } from "react-router-dom";
 import LiveMap from "../components/LiveMap";
 
 export default function RideTracking() {
   const [driverLocation, setDriverLocation] = useState(null);
+  const { state } = useLocation();
+
+  const ride = state;
 
   useEffect(() => {
     socket.on("driver-location", (location) => {
@@ -18,7 +22,11 @@ export default function RideTracking() {
 
       <h1 className="text-xl mb-4">Driver is coming 🚗</h1>
 
-      <LiveMap driverLocation={driverLocation} />
+      <LiveMap
+        driverLocation={driverLocation}
+        pickup={ride?.pickupCoords}
+        destination={ride?.destinationCoords}
+      />
 
     </div>
   );
