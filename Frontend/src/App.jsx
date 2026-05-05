@@ -10,12 +10,16 @@ import CaptainSignup from "./pages/captain/CaptainSignup";
 import CaptainDashboard from "./pages/captain/CaptainDashboard";
 import CaptainProfile from "./pages/captain/CaptainProfile";
 
-import ProtectedRoute from "./components/ProtectedRoute";
 import UserProfile from "./pages/UserProfile";
+
 import RideSelection from "./pages/RideSelection";
 import SearchingDriver from "./pages/SearchingDriver";
 import RideTracking from "./pages/RideTracking";
 
+import ConfirmRide from "./pages/ConfirmRide";
+import RideConfirmed from "./pages/RideConfirmed"; // ✅ MUST EXIST
+
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -23,6 +27,8 @@ function App() {
       <ToastContainer />
 
       <Routes>
+
+        {/* AUTH */}
         <Route path="/" element={<UserLogin />} />
         <Route path="/signup" element={<UserSignup />} />
         <Route path="/captain/signup" element={<CaptainSignup />} />
@@ -37,7 +43,16 @@ function App() {
           }
         />
 
-        {/* CAPTAIN DASHBOARD */}
+        <Route
+          path="/user/profile"
+          element={
+            <ProtectedRoute role="user">
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* CAPTAIN */}
         <Route
           path="/captain/dashboard"
           element={
@@ -47,7 +62,6 @@ function App() {
           }
         />
 
-        {/* ✅ CAPTAIN PROFILE (NEW ROUTE) */}
         <Route
           path="/captain/profile"
           element={
@@ -56,15 +70,20 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* 🚗 RIDE FLOW (CLEAN ORDER) */}
+
+        {/* CONFIRM RIDE */}
         <Route
-          path="/user/profile"
+          path="/ride/confirm"
           element={
             <ProtectedRoute role="user">
-              <UserProfile />
+              <ConfirmRide />
             </ProtectedRoute>
           }
         />
-        {/* RIDE SELECTION */}
+
+        {/* SELECT RIDE */}
         <Route
           path="/ride/select"
           element={
@@ -73,12 +92,40 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/*seaching the ride */}
-        <Route path="/ride/searching" element={<SearchingDriver />} />
-        {/*tracking the ride */}
-        <Route path="/ride/tracking" element={<RideTracking />} />
-        {/* OPTIONAL */}
+
+        {/* SEARCH DRIVER */}
+        <Route
+          path="/ride/searching"
+          element={
+            <ProtectedRoute role="user">
+              <SearchingDriver />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* LIVE TRACKING */}
+        <Route
+          path="/ride/tracking"
+          element={
+            <ProtectedRoute role="user">
+              <RideTracking />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* SUCCESS PAGE */}
+        <Route
+          path="/ride/confirmed"
+          element={
+            <ProtectedRoute role="user">
+              <RideConfirmed />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* FALLBACK */}
         <Route path="*" element={<h1>Page Not Found</h1>} />
+
       </Routes>
     </>
   );

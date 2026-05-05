@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
 
 export default function ConfirmRide() {
   const { state } = useLocation();
@@ -7,12 +8,14 @@ export default function ConfirmRide() {
 
   const { pickup, destination } = state || {};
 
-  const handleConfirm = () => {
+  useEffect(() => {
     if (!pickup || !destination) {
-      return toast.error("Ride details missing");
+      toast.error("No ride data found");
+      navigate("/home");
     }
+  }, []);
 
-    // 👉 go to ride creation page
+  const handleConfirm = () => {
     navigate("/ride/select", {
       state: { pickup, destination },
     });
@@ -32,13 +35,8 @@ export default function ConfirmRide() {
         </h1>
 
         <div className="space-y-3 text-gray-300">
-          <p>
-            📍 Pickup: <span className="text-white">{pickup}</span>
-          </p>
-
-          <p>
-            🏁 Destination: <span className="text-white">{destination}</span>
-          </p>
+          <p>📍 Pickup: <span className="text-white">{pickup}</span></p>
+          <p>🏁 Destination: <span className="text-white">{destination}</span></p>
         </div>
 
         <div className="flex gap-3 mt-6">
