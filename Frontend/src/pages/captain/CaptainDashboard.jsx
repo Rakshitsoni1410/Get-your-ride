@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import socket from "../../socket";
 import { toast } from "react-toastify";
 
-let watchId = null; // 🔥 GLOBAL
+let watchId = null; // 🔥 global tracker
 
 export default function CaptainDashboard() {
   const [ride, setRide] = useState(null);
@@ -12,28 +12,32 @@ export default function CaptainDashboard() {
   const captainId = localStorage.getItem("captainId");
   const token = localStorage.getItem("token");
 
-  // 🔥 JOIN SOCKET
+  // 🔥 SOCKET JOIN
   useEffect(() => {
     if (!captainId) return;
 
     socket.emit("join", { userId: captainId, role: "captain" });
 
-    socket.on("new-ride", (data) => {
+    const handleNewRide = (data) => {
       setRide(data);
       toast.info("New ride request 🚕");
-    });
+    };
 
-    return () => socket.off("new-ride");
+    socket.on("new-ride", handleNewRide);
+
+    return () => {
+      socket.off("new-ride", handleNewRide);
+    };
   }, [captainId]);
 
-  // 🚀 ONLINE
+  // 🟢 GO ONLINE
   const goOnline = () => {
     socket.emit("captain-online", captainId);
     setIsOnline(true);
     toast.success("You are ONLINE 🟢");
   };
 
-  // 🔴 OFFLINE
+  // 🔴 GO OFFLINE
   const goOffline = () => {
     setIsOnline(false);
     setRide(null);
@@ -41,8 +45,8 @@ export default function CaptainDashboard() {
     toast.info("You are OFFLINE 🔴");
   };
 
-  // 📍 START TRACKING
-  const startLocationSharing = () => {
+  // 📍 START LIVE LOCATION
+  const startLocationSharing = (rideId) => {
     if (!navigator.geolocation) {
       return toast.error("Geolocation not supported");
     }
@@ -54,14 +58,21 @@ export default function CaptainDashboard() {
           lng: pos.coords.longitude,
         };
 
-        socket.emit("driver-location", location); // 🔥 FIXED
+        // ✅ CORRECT EVENT
+        socket.emit("captain-location", {
+          rideId,
+          location,
+        });
       },
       () => toast.error("Location error"),
-      { enableHighAccuracy: true }
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+      }
     );
   };
 
-  // 🛑 STOP TRACKING
+  // 🛑 STOP LOCATION
   const stopLocationSharing = () => {
     if (watchId !== null) {
       navigator.geolocation.clearWatch(watchId);
@@ -70,54 +81,54 @@ export default function CaptainDashboard() {
   };
 
   // 🚗 ACCEPT RIDE
-const acceptRide = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
+  const acceptRide = async () => {
+    try {
+      if (!ride) return;
 
-    // 🔥 HARD CHECK
-    if (role !== "captain") {
-      return toast.error("You are not captain ❌");
-    }
-
-    const res = await fetch("http://localhost:5000/api/ride/accept", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ rideId: ride._id }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok && data.ride) {
-      setActiveRide(data.ride);
-      setRide(null);
-
-      toast.success("Ride accepted 🚗");
-
-      startLocationSharing(data.ride._id);
-
-      socket.emit("accept-ride", {
-        rideId: data.ride._id,
-        userId: data.ride.user,
-        captainId,
+      const res = await fetch("http://localhost:5000/api/ride/accept", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`, // ✅ correct token
+        },
+        body: JSON.stringify({ rideId: ride._id }),
       });
 
-    } else {
-      toast.error(data.message || "Failed to accept ride");
-    }
+      const data = await res.json();
 
-  } catch (err) {
-    console.error(err);
-    toast.error("Error accepting ride");
-  }
-};
+      if (res.ok && data.ride) {
+        setActiveRide(data.ride);
+        setRide(null);
+
+        toast.success("Ride accepted 🚗");
+
+        // ✅ START GPS
+        startLocationSharing(data.ride._id);
+
+        // ✅ NOTIFY USER
+        socket.emit("accept-ride", {
+          rideId: data.ride._id,
+          userId: data.ride.user,
+          captainId,
+        });
+
+      } else {
+        toast.error(data.message || "Failed to accept ride");
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Error accepting ride");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white p-4">
-      <h1 className="text-2xl mb-4">Captain Dashboard 🚗</h1>
+      <h1 className="text-2xl mb-4 font-bold">
+        Captain Dashboard 🚗
+      </h1>
 
+      {/* ONLINE BUTTON */}
       <button
         onClick={isOnline ? goOffline : goOnline}
         className={`w-full py-3 rounded-xl mb-4 ${
@@ -127,24 +138,35 @@ const acceptRide = async () => {
         {isOnline ? "Go Offline 🔴" : "Go Online 🟢"}
       </button>
 
-      {!isOnline && <p className="text-center">Go online to get rides</p>}
+      {/* OFFLINE STATE */}
+      {!isOnline && (
+        <p className="text-center text-gray-400 mt-10">
+          Go online to receive rides
+        </p>
+      )}
 
-      {ride && (
-        <div className="bg-gray-800 p-4 rounded-xl">
-          <p>📍 {ride.pickup}</p>
-          <p>🏁 {ride.destination}</p>
+      {/* NEW RIDE */}
+      {isOnline && ride && (
+        <div className="bg-gray-800 p-4 rounded-xl mb-4">
+          <p className="text-lg font-semibold mb-2">
+            New Ride Request 🚕
+          </p>
+
+          <p className="text-sm text-gray-300">📍 {ride.pickup}</p>
+          <p className="text-sm text-gray-300">🏁 {ride.destination}</p>
 
           <button
             onClick={acceptRide}
-            className="w-full mt-3 bg-green-500 py-2 rounded"
+            className="w-full mt-4 py-2 bg-green-500 rounded-lg"
           >
             Accept Ride
           </button>
         </div>
       )}
 
+      {/* ACTIVE RIDE */}
       {activeRide && (
-        <div className="bg-green-900 p-4 rounded-xl mt-4">
+        <div className="bg-green-900 p-4 rounded-xl">
           Ride in Progress 🚕
         </div>
       )}

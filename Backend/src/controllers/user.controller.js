@@ -1,46 +1,45 @@
-const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
-exports.registerUser = async (req, res) => {
+// ✅ USER AUTH
+exports.authUser = (req, res, next) => {
   try {
-    const { fullname, email, password } = req.body;
+    const token = req.headers.authorization?.split(" ")[1]; // 🔥 FIX
 
-    const existing = await User.findOne({ email });
-    if (existing) {
-      return res.json({ message: "User already exists" });
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
     }
 
-    const user = await User.create({
-      fullname,
-      email,
-      password
-    });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const token = jwt.sign({ id: user._id }, "secret");
+    req.user = decoded;
 
-    res.json({ token, user });
-
+    next();
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("AUTH USER ERROR:", err);
+    res.status(401).json({ message: "Invalid token" });
   }
 };
 
-
-exports.loginUser = async (req, res) => {
+// ✅ CAPTAIN AUTH
+exports.authCaptain = (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const token = req.headers.authorization?.split(" ")[1]; // 🔥 FIX
 
-    const user = await User.findOne({ email });
-    if (!user) return res.json({ message: "Invalid email" });
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
 
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) return res.json({ message: "Wrong password" });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const token = jwt.sign({ id: user._id }, "secret");
+    if (decoded.role !== "captain") {
+      return res.status(403).json({ message: "Access denied" });
+    }
 
-    res.json({ token, user });
+    req.user = decoded;
 
+    next();
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("AUTH CAPTAIN ERROR:", err);
+    res.status(401).json({ message: "Invalid token" });
   }
 };
