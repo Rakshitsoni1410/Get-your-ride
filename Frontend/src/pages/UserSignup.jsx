@@ -1,153 +1,127 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Car, Eye, EyeOff } from "lucide-react";
 
 export default function UserSignup() {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    firstname: "",
-    lastname: "",
-    email: "",
-    password: ""
-  });
-
+  const [form, setForm] = useState({ firstname: "", lastname: "", email: "", password: "" });
   const [errors, setErrors] = useState({});
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // 🔥 VALIDATION
-  const validateField = (name, value) => {
+  const validate = (name, value) => {
     let error = "";
-
-    if (name === "firstname" && !value) {
-      error = "First name required";
-    }
-
+    if (name === "firstname" && !value.trim()) error = "First name required";
     if (name === "email") {
       if (!value) error = "Email required";
-      else if (!/\S+@\S+\.\S+/.test(value)) error = "Invalid email";
+      else if (!/\S+@\S+\.\S+/.test(value)) error = "Invalid email format";
     }
-
     if (name === "password") {
       if (!value) error = "Password required";
-      else if (value.length < 6) error = "Min 6 characters";
+      else if (value.length < 6) error = "At least 6 characters";
     }
-
-    setErrors((prev) => ({ ...prev, [name]: error }));
+    setErrors((p) => ({ ...p, [name]: error }));
   };
 
-  // 🔥 HANDLE CHANGE
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setForm({ ...form, [name]: value });
-    validateField(name, value);
+    validate(name, value);
   };
 
   const handleSignup = async () => {
-    const hasErrors = Object.values(errors).some((err) => err);
-
-    if (hasErrors) {
-      return toast.error("Fix errors first");
-    }
-
-    if (!form.firstname || !form.email || !form.password) {
-      return toast.error("Fill required fields");
-    }
+    // Validate all
+    ["firstname", "email", "password"].forEach((f) => validate(f, form[f]));
+    if (!form.firstname || !form.email || !form.password) return toast.error("Fill all required fields");
+    if (Object.values(errors).some((e) => e)) return toast.error("Fix errors first");
 
     try {
+      setLoading(true);
       const res = await fetch("http://localhost:5000/api/user/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fullname: {
-            firstname: form.firstname,
-            lastname: form.lastname
-          },
+          fullname: { firstname: form.firstname, lastname: form.lastname },
           email: form.email,
-          password: form.password
-        })
+          password: form.password,
+        }),
       });
-
       const data = await res.json();
-
       if (data.token) {
         localStorage.setItem("token", data.token);
-
-        toast.success("Account created 🎉");
-
-        setTimeout(() => {
-          navigate("/home");
-        }, 1500);
+        localStorage.setItem("role", "user");
+        if (data.user) localStorage.setItem("userId", data.user._id);
+        toast.success("Account created! 🎉");
+        setTimeout(() => navigate("/home"), 800);
       } else {
         toast.error(data.message || "Signup failed");
       }
-
-    } catch (err) {
+    } catch {
       toast.error("Server error");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const Field = ({ name, type = "text", placeholder, extra }) => (
+    <div>
+      <div className="relative">
+        <input
+          name={name}
+          type={type === "password" ? (showPwd ? "text" : "password") : type}
+          onChange={handleChange}
+          placeholder={placeholder}
+          className={`input ${errors[name] ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
+        />
+        {type === "password" && (
+          <button onClick={() => setShowPwd(!showPwd)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#555] hover:text-white transition">
+            {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+      </div>
+      {errors[name] && <p className="text-red-400 text-xs mt-1 ml-1">{errors[name]}</p>}
+      {extra}
+    </div>
+  );
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A] px-4 py-8 relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#F5C518]/5 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="card">
+      <div className="card relative z-10">
+        <div className="flex items-center gap-2 mb-8">
+          <div className="w-10 h-10 bg-[#F5C518] rounded-xl flex items-center justify-center">
+            <Car size={20} className="text-black" />
+          </div>
+          <div>
+            <p className="title text-xl leading-none">GetYourRide</p>
+            <p className="subtitle text-xs">Fast · Safe · Comfortable</p>
+          </div>
+        </div>
 
-        <h1 className="title">Get Your Ride 🚗</h1>
-        <p className="subtitle">Create your account</p>
+        <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'Syne, sans-serif' }}>Create account</h1>
+        <p className="text-[#666] text-sm mb-6">Join thousands of happy riders</p>
 
-        {/* FIRST NAME */}
-        <input
-          name="firstname"
-          onChange={handleChange}
-          className={`input mt-6 ${errors.firstname ? "border-red-500" : ""}`}
-          placeholder="First Name"
-        />
-        {errors.firstname && (
-          <p className="text-red-500 text-xs">{errors.firstname}</p>
-        )}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <input name="firstname" onChange={handleChange} placeholder="First name *" className={`input !mt-0 ${errors.firstname ? "border-red-500" : ""}`} />
+            {errors.firstname && <p className="text-red-400 text-xs mt-1">{errors.firstname}</p>}
+          </div>
+          <input name="lastname" onChange={handleChange} placeholder="Last name" className="input !mt-0" />
+        </div>
 
-        {/* LAST NAME */}
-        <input
-          name="lastname"
-          onChange={handleChange}
-          className="input"
-          placeholder="Last Name"
-        />
+        <Field name="email" type="email" placeholder="Email address *" />
+        <Field name="password" type="password" placeholder="Password (min 6 chars) *" />
 
-        {/* EMAIL */}
-        <input
-          name="email"
-          onChange={handleChange}
-          className={`input ${errors.email ? "border-red-500" : ""}`}
-          placeholder="Email"
-        />
-        {errors.email && (
-          <p className="text-red-500 text-xs">{errors.email}</p>
-        )}
-
-        {/* PASSWORD */}
-        <input
-          name="password"
-          type="password"
-          onChange={handleChange}
-          className={`input ${errors.password ? "border-red-500" : ""}`}
-          placeholder="Password"
-        />
-        {errors.password && (
-          <p className="text-red-500 text-xs">{errors.password}</p>
-        )}
-
-        <button onClick={handleSignup} className="btn">
-          Signup
+        <button onClick={handleSignup} className="btn" disabled={loading}>
+          {loading ? "Creating account..." : "Create Account"}
         </button>
 
-        <p className="text-sm text-center mt-5 text-gray-300">
-          Already have account?{" "}
-          <Link to="/" className="text-white font-semibold">
-            Login
-          </Link>
+        <p className="text-sm text-center mt-6 text-[#666]">
+          Already have an account?{" "}
+          <Link to="/" className="text-[#F5C518] font-semibold hover:underline">Sign in</Link>
         </p>
-
       </div>
     </div>
   );
