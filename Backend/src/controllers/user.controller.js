@@ -1,45 +1,46 @@
+const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
-// ✅ USER AUTH
-exports.authUser = (req, res, next) => {
+exports.registerUser = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1]; // 🔥 FIX
+    const { fullname, email, password } = req.body;
 
-    if (!token) {
-      return res.status(401).json({ message: "No token provided" });
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.json({ message: "User already exists" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.create({
+      fullname,
+      email,
+      password
+    });
 
-    req.user = decoded;
+    const token = jwt.sign({ id: user._id }, "secret");
 
-    next();
+    res.json({ token, user });
+
   } catch (err) {
-    console.error("AUTH USER ERROR:", err);
-    res.status(401).json({ message: "Invalid token" });
+    res.status(500).json({ error: err.message });
   }
 };
 
-// ✅ CAPTAIN AUTH
-exports.authCaptain = (req, res, next) => {
+
+exports.loginUser = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1]; // 🔥 FIX
+    const { email, password } = req.body;
 
-    if (!token) {
-      return res.status(401).json({ message: "No token provided" });
-    }
+    const user = await User.findOne({ email });
+    if (!user) return res.json({ message: "Invalid email" });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) return res.json({ message: "Wrong password" });
 
-    if (decoded.role !== "captain") {
-      return res.status(403).json({ message: "Access denied" });
-    }
+    const token = jwt.sign({ id: user._id }, "secret");
 
-    req.user = decoded;
+    res.json({ token, user });
 
-    next();
   } catch (err) {
-    console.error("AUTH CAPTAIN ERROR:", err);
-    res.status(401).json({ message: "Invalid token" });
+    res.status(500).json({ error: err.message });
   }
 };
