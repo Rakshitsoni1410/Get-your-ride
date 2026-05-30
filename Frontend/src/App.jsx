@@ -20,6 +20,8 @@ import ConfirmRide from "./pages/ConfirmRide";
 import RideConfirmed from "./pages/RideConfirmed"; // ✅ MUST EXIST
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import Payment from "./pages/payment";
+import RatingReview from "./pages/Ratingreview";
 
 function App() {
   return (
@@ -27,7 +29,6 @@ function App() {
       <ToastContainer />
 
       <Routes>
-
         {/* AUTH */}
         <Route path="/" element={<UserLogin />} />
         <Route path="/signup" element={<UserSignup />} />
@@ -123,9 +124,25 @@ function App() {
           }
         />
 
+        <Route
+          path="/ride/payment"
+          element={
+            <ProtectedRoute role="user">
+              <Payment />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ride/rate"
+          element={
+            <ProtectedRoute role="user">
+              <RatingReview />
+            </ProtectedRoute>
+          }
+        />
         {/* FALLBACK */}
         <Route path="*" element={<h1>Page Not Found</h1>} />
-
       </Routes>
     </>
   );
