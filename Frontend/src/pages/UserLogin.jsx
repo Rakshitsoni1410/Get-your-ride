@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Eye, EyeOff } from "lucide-react";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function UserLogin() {
   const navigate = useNavigate();
@@ -45,12 +46,23 @@ export default function UserLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A] px-4 relative overflow-hidden">
+    <div
+      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      style={{ background: "var(--bg-base)" }}
+    >
       {/* Background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#F5C518]/5 rounded-full blur-[100px] pointer-events-none" />
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[100px] pointer-events-none"
+        style={{ background: "var(--glow)", opacity: 3 }}
+      />
+
+      {/* Theme toggle top-right */}
+      <div className="absolute top-5 right-5">
+        <ThemeToggle />
+      </div>
 
       <div className="card relative z-10">
-        {/* ── LOGO ── */}
+        {/* LOGO */}
         <div className="flex items-center gap-3 mb-8">
           <img
             src="/logo.png"
@@ -60,11 +72,17 @@ export default function UserLogin() {
           <div>
             <p
               className="text-xl font-extrabold leading-none"
-              style={{ fontFamily: "Syne, sans-serif" }}
+              style={{
+                fontFamily: "Syne, sans-serif",
+                color: "var(--text-primary)",
+              }}
             >
               GetYourRide
             </p>
-            <p className="text-xs text-[#888] mt-0.5">
+            <p
+              className="text-xs mt-0.5"
+              style={{ color: "var(--text-secondary)" }}
+            >
               Fast · Safe · Comfortable
             </p>
           </div>
@@ -72,11 +90,14 @@ export default function UserLogin() {
 
         <h1
           className="text-2xl font-bold mb-1"
-          style={{ fontFamily: "Syne, sans-serif" }}
+          style={{
+            fontFamily: "Syne, sans-serif",
+            color: "var(--text-primary)",
+          }}
         >
           Sign in
         </h1>
-        <p className="text-[#666] text-sm mb-6">
+        <p className="text-sm mb-6" style={{ color: "var(--text-secondary)" }}>
           Enter your credentials to continue
         </p>
 
@@ -100,7 +121,8 @@ export default function UserLogin() {
           />
           <button
             onClick={() => setShowPwd(!showPwd)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#555] hover:text-white transition"
+            className="absolute right-4 top-1/2 -translate-y-1/2 transition"
+            style={{ color: "var(--text-muted)" }}
           >
             {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -110,21 +132,32 @@ export default function UserLogin() {
           {loading ? "Signing in..." : "Sign In"}
         </button>
 
-        <div className="mt-6 pt-6 border-t border-[#1e1e1e] space-y-3">
-          <p className="text-sm text-center text-[#666]">
+        <div
+          className="mt-6 pt-6 space-y-3"
+          style={{ borderTop: "1px solid var(--border-subtle)" }}
+        >
+          <p
+            className="text-sm text-center"
+            style={{ color: "var(--text-secondary)" }}
+          >
             No account?{" "}
             <Link
               to="/signup"
-              className="text-[#F5C518] font-semibold hover:underline"
+              className="font-semibold hover:underline"
+              style={{ color: "var(--accent)" }}
             >
               Create one
             </Link>
           </p>
-          <p className="text-sm text-center text-[#666]">
+          <p
+            className="text-sm text-center"
+            style={{ color: "var(--text-secondary)" }}
+          >
             Are you a driver?{" "}
             <Link
               to="/captain/signup"
-              className="text-[#F5C518] font-semibold hover:underline"
+              className="font-semibold hover:underline"
+              style={{ color: "var(--accent)" }}
             >
               Join as Captain
             </Link>

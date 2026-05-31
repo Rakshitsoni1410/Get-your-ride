@@ -4,23 +4,31 @@ import { toast } from "react-toastify";
 import { Star, ThumbsUp, Send } from "lucide-react";
 
 const QUICK_TAGS = [
-  "Great driver", "On time", "Clean vehicle", "Safe driving",
-  "Friendly", "Smooth ride", "Good navigation", "Professional",
+  "Great driver",
+  "On time",
+  "Clean vehicle",
+  "Safe driving",
+  "Friendly",
+  "Smooth ride",
+  "Good navigation",
+  "Professional",
 ];
 
 export default function RatingReview() {
   const { state: ride } = useLocation();
   const navigate = useNavigate();
 
-  const [rating,   setRating]   = useState(0);
-  const [hover,    setHover]    = useState(0);
-  const [tags,     setTags]     = useState([]);
-  const [comment,  setComment]  = useState("");
-  const [loading,  setLoading]  = useState(false);
-  const [submitted,setSubmitted]= useState(false);
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [tags, setTags] = useState([]);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const toggleTag = (tag) =>
-    setTags((p) => p.includes(tag) ? p.filter((t) => t !== tag) : [...p, tag]);
+    setTags((p) =>
+      p.includes(tag) ? p.filter((t) => t !== tag) : [...p, tag],
+    );
 
   const submitRating = async () => {
     if (rating === 0) return toast.error("Please select a star rating");
@@ -29,7 +37,10 @@ export default function RatingReview() {
       const token = localStorage.getItem("token");
       await fetch("http://localhost:5000/api/ride/rate", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ rideId: ride?._id, rating, tags, comment }),
       });
       setSubmitted(true);
@@ -40,7 +51,10 @@ export default function RatingReview() {
     }
   };
 
-  const label = ["", "Terrible 😞", "Poor 😕", "Okay 😐", "Good 😊", "Excellent 🤩"][hover || rating] || "";
+  const label =
+    ["", "Terrible 😞", "Poor 😕", "Okay 😐", "Good 😊", "Excellent 🤩"][
+      hover || rating
+    ] || "";
 
   if (submitted) {
     return (
@@ -48,11 +62,23 @@ export default function RatingReview() {
         <div className="w-24 h-24 bg-[#F5C518]/10 rounded-full flex items-center justify-center mb-6 border-2 border-[#F5C518]/30">
           <ThumbsUp size={40} className="text-[#F5C518]" />
         </div>
-        <h1 className="text-3xl font-extrabold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>Thank you!</h1>
-        <p className="text-[#555] text-sm mb-8">Your feedback helps us improve</p>
+        <h1
+          className="text-3xl font-extrabold mb-2"
+          style={{ fontFamily: "Syne, sans-serif" }}
+        >
+          Thank you!
+        </h1>
+        <p className="text-[#555] text-sm mb-8">
+          Your feedback helps us improve
+        </p>
         <div className="flex gap-1 mb-8">
-          {[1,2,3,4,5].map((s) => (
-            <Star key={s} size={32} className={s <= rating ? "text-[#F5C518]" : "text-[#333]"} fill={s <= rating ? "#F5C518" : "none"} />
+          {[1, 2, 3, 4, 5].map((s) => (
+            <Star
+              key={s}
+              size={32}
+              className={s <= rating ? "text-[#F5C518]" : "text-[#333]"}
+              fill={s <= rating ? "#F5C518" : "none"}
+            />
           ))}
         </div>
         <button
@@ -68,24 +94,44 @@ export default function RatingReview() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex flex-col px-4 pt-10 pb-8">
-      <button onClick={() => navigate(-1)} className="text-[#666] hover:text-white transition text-sm mb-6">← Back</button>
+      <button
+        onClick={() => navigate(-1)}
+        className="text-[#666] hover:text-white transition text-sm mb-6"
+      >
+        ← Back
+      </button>
 
       <p className="section-label">Feedback</p>
-      <h1 className="text-3xl font-extrabold mb-2" style={{ fontFamily: "Syne, sans-serif" }}>Rate your ride</h1>
+      <h1
+        className="text-3xl font-extrabold mb-2"
+        style={{ fontFamily: "Syne, sans-serif" }}
+      >
+        Rate your ride
+      </h1>
       <p className="text-[#555] text-sm mb-8">How was your experience?</p>
 
       {/* Captain info */}
       {ride?.captain && (
         <div className="flex items-center gap-4 bg-[#111] border border-[#1e1e1e] rounded-2xl p-4 mb-8">
-          <div className="w-14 h-14 bg-[#F5C518] rounded-2xl flex items-center justify-center text-2xl">👨‍✈️</div>
+          <div className="w-14 h-14 bg-[#F5C518] rounded-2xl flex items-center justify-center text-2xl">
+            👨‍✈️
+          </div>
           <div>
             <p className="font-bold" style={{ fontFamily: "Syne, sans-serif" }}>
-              {ride.captain?.fullname?.firstname} {ride.captain?.fullname?.lastname || ""}
+              {ride.captain?.fullname?.firstname}{" "}
+              {ride.captain?.fullname?.lastname || ""}
             </p>
-            <p className="text-[#555] text-sm capitalize">{ride.vehicleType} · {ride.captain?.vehicle?.plate}</p>
+            <p className="text-[#555] text-sm capitalize">
+              {ride.vehicleType} · {ride.captain?.vehicle?.plate}
+            </p>
           </div>
           <div className="ml-auto text-right">
-            <p className="text-[#F5C518] font-bold text-lg" style={{ fontFamily: "Syne, sans-serif" }}>₹{ride.fare}</p>
+            <p
+              className="text-[#F5C518] font-bold text-lg"
+              style={{ fontFamily: "Syne, sans-serif" }}
+            >
+              ₹{ride.fare}
+            </p>
             <p className="text-[#555] text-xs">{ride.distance} km</p>
           </div>
         </div>
@@ -104,7 +150,9 @@ export default function RatingReview() {
             >
               <Star
                 size={44}
-                className={s <= (hover || rating) ? "text-[#F5C518]" : "text-[#2a2a2a]"}
+                className={
+                  s <= (hover || rating) ? "text-[#F5C518]" : "text-[#2a2a2a]"
+                }
                 fill={s <= (hover || rating) ? "#F5C518" : "none"}
                 strokeWidth={1.5}
               />
@@ -117,7 +165,9 @@ export default function RatingReview() {
       {/* Quick tags */}
       {rating > 0 && (
         <div className="mb-6">
-          <p className="text-xs text-[#555] uppercase tracking-widest font-semibold mb-3">What went well?</p>
+          <p className="text-xs text-[#555] uppercase tracking-widest font-semibold mb-3">
+            What went well?
+          </p>
           <div className="flex flex-wrap gap-2">
             {QUICK_TAGS.map((tag) => (
               <button
@@ -139,7 +189,9 @@ export default function RatingReview() {
       {/* Comment */}
       {rating > 0 && (
         <div className="mb-8">
-          <p className="text-xs text-[#555] uppercase tracking-widest font-semibold mb-2">Additional comments</p>
+          <p className="text-xs text-[#555] uppercase tracking-widest font-semibold mb-2">
+            Additional comments
+          </p>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
@@ -150,7 +202,7 @@ export default function RatingReview() {
           />
         </div>
       )}
-
+s
       <button
         onClick={submitRating}
         disabled={loading || rating === 0}
