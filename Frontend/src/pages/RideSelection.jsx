@@ -112,7 +112,7 @@ export default function RideSelection() {
       setLoading(true);
       const token = localStorage.getItem("token");
       const fare = calcFare(selected, distance);
-      const res = await fetch("http://localhost:5000/api/ride/create", {
+      const res = await fetch("https://get-your-ride.onrender.com/api/ride/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -20,7 +20,7 @@ export default function CaptainProfile() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5000/api/captain/me", {
+    fetch("https://get-your-ride.onrender.com/api/captain/me", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())

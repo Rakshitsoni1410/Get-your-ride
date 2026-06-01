@@ -20,7 +20,7 @@ export default function RideHistory() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5000/api/ride/history", {
+    fetch("https://get-your-ride.onrender.com/api/ride/history", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())

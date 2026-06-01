@@ -131,7 +131,7 @@ export default function CaptainDashboard() {
   const acceptRide = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/ride/accept", {
+      const res = await fetch("https://get-your-ride.onrender.com/api/ride/accept", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -173,7 +173,7 @@ export default function CaptainDashboard() {
   const completeRide = async () => {
     try {
       const token = localStorage.getItem("token");
-      await fetch("http://localhost:5000/api/ride/complete", {
+      await fetch("https://get-your-ride.onrender.com/api/ride/complete", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

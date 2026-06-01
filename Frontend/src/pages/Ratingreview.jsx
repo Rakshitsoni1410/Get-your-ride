@@ -35,7 +35,7 @@ export default function RatingReview() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      await fetch("http://localhost:5000/api/ride/rate", {
+      await fetch("https://get-your-ride.onrender.com/api/ride/rate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

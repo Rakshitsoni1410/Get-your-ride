@@ -67,7 +67,7 @@ export default function UserSignup() {
       setLoading(true);
 
       const res = await fetch(
-        "http://localhost:5000/api/user/register",
+        "https://get-your-ride.onrender.com/api/user/register",
         {
           method: "POST",
           headers: {

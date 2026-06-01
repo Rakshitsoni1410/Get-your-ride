@@ -10,7 +10,7 @@ export default function UserProfile() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5000/api/user/me", {
+    fetch("https://get-your-ride.onrender.com//api/user/me", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())

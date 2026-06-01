@@ -58,7 +58,7 @@ export default function CaptainSignup() {
     }
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:5000/api/captain/register", {
+      const res = await fetch("https://get-your-ride.onrender.com/api/captain/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
