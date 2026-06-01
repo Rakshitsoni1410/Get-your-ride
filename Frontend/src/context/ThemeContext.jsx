@@ -8,13 +8,18 @@ export function ThemeProvider({ children }) {
   });
 
   useEffect(() => {
-    // Remove both first, then apply the correct one
-    document.documentElement.removeAttribute("data-theme");
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  // Apply on first render too
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") || "dark";
+    document.documentElement.setAttribute("data-theme", saved);
+  }, []);
+
+  const toggleTheme = () =>
+    setTheme((t) => (t === "dark" ? "light" : "dark"));
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
