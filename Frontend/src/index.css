@@ -1,24 +1,77 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@layer components {
-  .card {
-    @apply w-full max-w-md rounded-3xl shadow-2xl p-6;
-    background: var(--card-bg);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-  }
+/* DEFAULT (no attribute) = dark */
+:root {
+  --bg-base:       #0A0A0A;
+  --bg-card:       #111111;
+  --bg-input:      #1a1a1a;
+  --bg-hover:      #222222;
+  --border-subtle: #1e1e1e;
+  --border-input:  #2a2a2a;
+  --text-primary:  #ffffff;
+  --text-secondary:#888888;
+  --text-muted:    #555555;
+  --text-placeholder: #555555;
+  --accent:        #F5C518;
+  --accent-hover:  #ffd84d;
+  --accent-text:   #000000;
+  --divider:       #2a2a2a;
+  --shadow:        rgba(0,0,0,0.5);
+  --glow:          rgba(245,197,24,0.05);
+  --section-label: #F5C518;
+  --btn-bg:        #ffffff;
+  --btn-text:      #000000;
+  --spinner-border:#F5C518;
+  --overlay-bg:    rgba(10,10,10,0.95);
+}
 
-  .input {
-    @apply w-full mt-1 px-4 py-3 rounded-xl focus:outline-none;
-    background: var(--input-bg);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-  }
+/* DARK THEME explicit */
+[data-theme="dark"] {
+  --bg-base:       #0A0A0A;
+  --bg-card:       #111111;
+  --bg-input:      #1a1a1a;
+  --bg-hover:      #222222;
+  --border-subtle: #1e1e1e;
+  --border-input:  #2a2a2a;
+  --text-primary:  #ffffff;
+  --text-secondary:#888888;
+  --text-muted:    #555555;
+  --text-placeholder: #555555;
+  --accent:        #F5C518;
+  --accent-hover:  #ffd84d;
+  --accent-text:   #000000;
+  --divider:       #2a2a2a;
+  --shadow:        rgba(0,0,0,0.5);
+  --glow:          rgba(245,197,24,0.05);
+  --section-label: #F5C518;
+  --btn-bg:        #ffffff;
+  --btn-text:      #000000;
+  --spinner-border:#F5C518;
+  --overlay-bg:    rgba(10,10,10,0.95);
+}
 
-  .btn {
-    @apply w-full mt-6 py-3 rounded-xl font-semibold transition;
-    background: var(--button-bg);
-    color: var(--button-text);
-  }
+/* LIGHT THEME */
+[data-theme="light"] {
+  --bg-base:       #f5f5f0;
+  --bg-card:       #ffffff;
+  --bg-input:      #f0efe9;
+  --bg-hover:      #e8e7e0;
+  --border-subtle: #e2e1da;
+  --border-input:  #d4d3cc;
+  --text-primary:  #111111;
+  --text-secondary:#555555;
+  --text-muted:    #999999;
+  --text-placeholder: #aaaaaa;
+  --accent:        #D4A017;
+  --accent-hover:  #b8880e;
+  --accent-text:   #000000;
+  --divider:       #d4d3cc;
+  --shadow:        rgba(0,0,0,0.1);
+  --glow:          rgba(212,160,23,0.08);
+  --section-label: #D4A017;
+  --btn-bg:        #111111;
+  --btn-text:      #ffffff;
+  --spinner-border:#D4A017;
+  --overlay-bg:    rgba(245,245,240,0.95);
 }
