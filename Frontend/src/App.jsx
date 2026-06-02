@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+import SplashScreen from "./components/SplashScreen";
 
 import UserLogin from "./pages/UserLogin";
 import UserSignup from "./pages/UserSignup";
@@ -17,16 +20,30 @@ import SearchingDriver from "./pages/SearchingDriver";
 import RideTracking from "./pages/RideTracking";
 
 import ConfirmRide from "./pages/ConfirmRide";
-import RideConfirmed from "./pages/RideConfirmed"; // ✅ MUST EXIST
+import RideConfirmed from "./pages/RideConfirmed";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Payment from "./pages/payment";
 import RatingReview from "./pages/Ratingreview";
+import RideHistory from "./pages/ridehistory";
 
 function App() {
+  const [showSplash, setShowSplash] = useState(() => {
+    // Only show splash once per session
+    const seen = sessionStorage.getItem("splashSeen");
+    return !seen;
+  });
+
+  const handleSplashComplete = () => {
+    sessionStorage.setItem("splashSeen", "true");
+    setShowSplash(false);
+  };
+
   return (
     <>
-      <ToastContainer />
+      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+
+      {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
 
       <Routes>
         {/* AUTH */}
@@ -43,7 +60,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/user/profile"
           element={
@@ -62,7 +78,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/captain/profile"
           element={
@@ -72,9 +87,7 @@ function App() {
           }
         />
 
-        {/* 🚗 RIDE FLOW (CLEAN ORDER) */}
-
-        {/* CONFIRM RIDE */}
+        {/* RIDE FLOW */}
         <Route
           path="/ride/confirm"
           element={
@@ -83,8 +96,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* SELECT RIDE */}
         <Route
           path="/ride/select"
           element={
@@ -93,8 +104,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* SEARCH DRIVER */}
         <Route
           path="/ride/searching"
           element={
@@ -103,8 +112,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* LIVE TRACKING */}
         <Route
           path="/ride/tracking"
           element={
@@ -113,8 +120,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* SUCCESS PAGE */}
         <Route
           path="/ride/confirmed"
           element={
@@ -123,7 +128,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/ride/payment"
           element={
@@ -132,7 +136,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/ride/rate"
           element={
@@ -141,6 +144,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/ride/history"
+          element={
+            <ProtectedRoute role="user">
+              <RideHistory />
+            </ProtectedRoute>
+          }
+        />
+
         {/* FALLBACK */}
         <Route path="*" element={<h1>Page Not Found</h1>} />
       </Routes>
